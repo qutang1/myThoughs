@@ -1,0 +1,80 @@
+Recursion: 10 days
+First Night:  726. Number of Atoms. 20/10/2019
+              这题做了快5个小时，做到怀疑人生。关于递归，不管题目怎么变化，心中需要默念的三件事是，
+              1.什么是我的base case
+              2. 什么是作为当前的我可以做的事情，并且可以减小题目规模 
+              3. 什么是我可以交给别人做的，当然这个别人就是我自己。 
+              这道题的关键是要把字母 + 数字看做一个整体， "K4(ON(SO3)2)2"， tricky的地方在于没有base case， 
+              因为无法预先将字符串拆分成相似的模块，所以必须一位位的处理，直到全部走完。 
+              作为当前的我可以解决的事情从一般递归的一件事变成了3件，
+              1. 如果遇到字符，我要把字符加数字读到字典里 
+              2. 如果遇到（， 我要去让别人处理括号里的东西，拿到结果以后我再往后读数字，把结果和数字读到字典里 
+              3. 如果遇到 ）， 返回处理的结果， 有点类似递归的结束条件。              
+              这题 Stack也可以做的， 预处理把（）分割出来记住位置也可以做。一道好题~~~
+              
+              class Solution {
+                private int pos;
+                private char[] formularArray;
+
+                public String countOfAtoms(String formula) {
+                    if(formula == null || formula.length() == 0) return "";
+                    formularArray = formula.toCharArray();
+                    pos = 0;
+                     StringBuilder res = new StringBuilder();
+                     Map<String, Integer> counts = recur();
+                    for (String name: counts.keySet()) {
+                        res.append(name);
+                        int count = counts.get(name);
+                        if (count > 1) res.append("" + count);
+                    }
+
+                    return res.toString();
+                }
+
+                private TreeMap<String, Integer> recur() {
+                   TreeMap<String, Integer> result = new TreeMap<>();
+                   while(pos != formularArray.length) {
+                       if(formularArray[pos] == '(') {
+                           pos++;
+                           TreeMap<String, Integer> tmp = recur();
+                           int count = getCount();
+                             for (Map.Entry<String, Integer> entry : tmp.entrySet()) {
+                                result.put(entry.getKey(), result.getOrDefault(entry.getKey(), 0)+ entry.getValue() * count);
+                             }
+                       } else if(formularArray[pos] == ')') {
+                           pos++;
+                           return result;
+                       } else {
+                           String name = getName();
+                           int count = getCount();
+                           result.put(name, result.getOrDefault(name, 0) + count);
+                       }
+
+                   }
+
+                    return result;
+                }
+
+                private String getName() {
+                    StringBuilder sb = new StringBuilder();
+                    char c = formularArray[pos++];
+                    sb.append(c);
+                    while(pos < formularArray.length && formularArray[pos] >= 'a' && formularArray[pos] <= 'z') {
+                      c = formularArray[pos];
+                      sb.append(c);
+                      pos++;
+                    }
+                    return sb.toString();
+                }
+
+                private int getCount() {
+                    int count = 0;
+                    while(pos < formularArray.length && formularArray[pos] >= '0' && formularArray[pos] <= '9') {
+                        char c = formularArray[pos];
+                        count = count * 10 + c - '0';
+                        pos++;
+                    }
+                    return count == 0 ? 1 : count;
+                }
+            }
+
