@@ -1,1 +1,31 @@
+Cosumer 用法：
+1. Cosumer连续叠加
+Consumer<Integer> consumer1 = x -> System.out.println("first x : " + x);
+Consumer<Integer> consumer2 = x -> {
+     System.out.println("second x : " + x);
+     throw new NullPointerException("throw exception test");
+};
+Consumer<Integer> consumer3 = x -> System.out.println("third x : " + x);
+consumer1.andThen(consumer2).andThen(consumer3).accept(1);
 
+2. 和ForEach一起用
+ArrayList<Integer> numberList = new ArrayList<>(Arrays.asList(1,2,3,4,5));     
+Consumer<Integer> action = System.out::println;
+numberList.forEach(action);
+Consumer<String> action2 = x -> System.out.println(x);
+list.stream().forEach(e -> System.out.print(e));
+
+3.和map用
+//1. Map entries
+Consumer<Map.Entry<String, Integer>> action = System.out::println;
+map.entrySet().forEach(action);
+//2. Map keys
+Consumer<String> actionOnKeys = System.out::println;
+map.keySet().forEach(actionOnKeys);
+//3. Map values
+Consumer<Integer> actionOnValues = System.out::println;
+map.values().forEach(actionOnValues);
+Consumer<Map.Entry<String, Integer>> action = entry ->
+{ System.out.println("Key is : " + entry.getKey());
+  System.out.println("Value is : " + entry.getValue());
+};
